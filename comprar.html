@@ -69,12 +69,46 @@
     input[type="text"]:focus, input[type="email"]:focus {
       border:1.5px solid #f0d479; background:#232329;
     }
-    #paypal-button-container { margin-top: 24px; }
     .cert-check {
       color: #b1b1b1; background: #22232b;
       padding: 7px 0; margin: 19px 0 8px 0; border-radius: 8px;
       font-size: 1.01em; text-align: center;
     }
+    /* Botones de pago */
+    .payment-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0 2px 0;
+    }
+    .pay-btn {
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 1.08em;
+      font-weight: 700;
+      color: #fff;
+      background: #22242d;
+      border: none;
+      border-radius: 11px;
+      padding: 10px 12px 10px 16px;
+      text-align: left;
+      cursor: pointer;
+      transition: background .18s, box-shadow .17s, transform .18s;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 9px #18181b0b;
+      letter-spacing: .3px;
+      outline: none;
+    }
+    .pay-btn.paypal { background: linear-gradient(100deg,#0a3571 60%,#1270db 100%); }
+    .pay-btn.yape { background: #6300f7; }
+    .pay-btn.binance { background: #121212; border: 1.2px solid #f3ba2f; color: #f3ba2f;}
+    .pay-btn.mercadopago { background: #00b4e3;}
+    .pay-btn:hover { box-shadow:0 6px 15px #0002; transform: translateY(-2px) scale(1.04);}
+    .pay-btn.paypal:hover { background: linear-gradient(100deg,#1270db 30%,#0a3571 100%);}
+    .pay-btn.yape:hover { background: #7e34fa;}
+    .pay-btn.binance:hover { background: #181818; color: #fff;}
+    .pay-btn.mercadopago:hover { background: #38c6f9;}
+    #paypal-button-container { margin-top: 18px; }
     /* Loader animado */
     .loader {
       width: 54px; height: 54px;
@@ -124,6 +158,25 @@
       <input type="email" id="email" required placeholder="Tu correo">
     </form>
     <div class="cert-check">&#128274; Pago seguro con Paypal</div>
+    <!-- BOTONES DE PAGO -->
+    <div class="payment-buttons">
+      <button id="btn-paypal" class="pay-btn paypal">
+        <svg width="28" height="28" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:7px;"><path fill="#fff" d="M8.5 3c-1.2 0-2.2.9-2.4 2.1l-3.5 14.6c-.1.3.1.5.4.5h3.6l1-4.2c.1-.4.4-.7.8-.7H15c2.5 0 4.5-1.8 5-4.2.5-2.6-1.3-4.3-3.7-4.3H8.5zm2.9 9H9.2c-.3 0-.6.2-.7.5l-.7 3h7.7c1.4 0 2.6-1 2.8-2.4.2-1.3-1-2.4-2.3-2.4h-2.9z"/></svg>
+        Pagar con Paypal
+      </button>
+      <button class="pay-btn yape" onclick="gotoWhatsapp('Yape')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Yape.png" width="22" style="vertical-align:middle;margin-right:7px;">
+        Yape Perú
+      </button>
+      <button class="pay-btn binance" onclick="gotoWhatsapp('Binance')">
+        <img src="https://cryptologos.cc/logos/binance-coin-bnb-logo.svg?v=026" width="22" style="vertical-align:middle;margin-right:7px;">
+        Binance (USDT/ARS)
+      </button>
+      <button class="pay-btn mercadopago" onclick="gotoWhatsapp('MercadoPago')">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mercado_Pago_logo.svg" width="26" style="vertical-align:middle;margin-right:7px;">
+        Mercado Pago
+      </button>
+    </div>
     <div id="paypal-button-container"></div>
     <div class="loader" id="loader">
       <div class="spin"></div>
@@ -165,37 +218,51 @@
     html += "</ul>";
     document.getElementById("beneficios-checkout").innerHTML = html;
 
-    // 3. Paypal Button Minimal
-    paypal.Buttons({
-      createOrder: function(data, actions) {
-        var discord = document.getElementById('discord').value.trim();
-        var email = document.getElementById('email').value.trim();
-        if (!discord || !email) {
-          alert('Completa todos los campos antes de pagar.');
-          return false;
-        }
-        document.getElementById("loader").style.display = "block";
-        return actions.order.create({
-          purchase_units: [{
-            amount: { value: precio, currency_code: "USD" },
-            description: `Membresía ${membresia}`,
-            custom_id: `${discord}|${membresia}|${email}`
-          }]
-        });
-      },
-      onApprove: function(data, actions) {
-        document.getElementById("loader").style.display = "block";
-        return actions.order.capture().then(function(details) {
+    // BOTÓN PAYPAL
+    document.getElementById('btn-paypal').onclick = function() {
+      document.getElementById('paypal-button-container').innerHTML = "";
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          var discord = document.getElementById('discord').value.trim();
+          var email = document.getElementById('email').value.trim();
+          if (!discord || !email) {
+            alert('Completa todos los campos antes de pagar.');
+            return false;
+          }
+          document.getElementById("loader").style.display = "block";
+          return actions.order.create({
+            purchase_units: [{
+              amount: { value: precio, currency_code: "USD" },
+              description: `Membresía ${membresia}`,
+              custom_id: `${discord}|${membresia}|${email}`
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          document.getElementById("loader").style.display = "block";
+          return actions.order.capture().then(function(details) {
+            document.getElementById("loader").style.display = "none";
+            alert('¡Pago realizado! Te contactaremos por Discord o email para activar tu membresía.');
+            window.location.href = "success.html";
+          });
+        },
+        onCancel: function(data) {
           document.getElementById("loader").style.display = "none";
-          alert('¡Pago realizado! Te contactaremos por Discord o email para activar tu membresía.');
-          window.location.href = "success.html";
-        });
-      },
-      onCancel: function(data) {
-        document.getElementById("loader").style.display = "none";
-        window.location.href = "cancel.html";
-      }
-    }).render('#paypal-button-container');
+          window.location.href = "cancel.html";
+        }
+      }).render('#paypal-button-container');
+    };
+
+    // Otros métodos
+    function gotoWhatsapp(metodo) {
+      const discord = document.getElementById('discord').value.trim();
+      const email = document.getElementById('email').value.trim();
+      let mensaje = encodeURIComponent(
+        `Hola, quiero comprar la membresía "${membresia}" (${precio} USD) y deseo pagar por ${metodo}. Mi Discord: ${discord} - Email: ${email}`
+      );
+      window.open(`https://wa.me/51994970590?text=${mensaje}`, '_blank');
+    }
+    window.gotoWhatsapp = gotoWhatsapp;
   </script>
 </body>
 </html>
