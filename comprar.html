@@ -8,6 +8,13 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
   <style>
+    body {
+      background: linear-gradient(120deg, #181b22 0%, #23242b 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
     .form-box {
       background: rgba(28,30,38,0.95);
       padding: 36px 22px 30px 22px;
@@ -100,14 +107,8 @@
     }
     @media (max-width:600px){.form-box{width:99vw;}}
   </style>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script>
-    (function(){ emailjs.init('TGvPiZzBjNDwexyHd'); })();
-  </script>
-  <!-- Supabase CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
-<body style="background:linear-gradient(120deg, #181b22 0%, #23242b 100%);display:flex;justify-content:center;align-items:center;min-height:100vh;">
+<body>
   <div class="form-box">
     <a href="index.html" style="text-decoration:none;"><img src="favicon.png" width="38" style="margin-bottom:13px; border-radius:9px;"></a>
     <h2 style="color:#fafafa;">Comprar Membresía</h2>
@@ -130,7 +131,7 @@
     </div>
   </div>
 
-  <!-- Paypal SDK -->
+  <!-- Paypal SDK Live -->
   <script src="https://www.paypal.com/sdk/js?client-id=ASuRVnsN90v9apMr8qppSHihfkuRI7uykgHKa27VwYIXp-Q_BnS3aC-mFR2cR2yLu_EUCrsRCsh745KB&currency=USD"></script>
   <script>
     // 1. Datos de membresía desde la URL
@@ -164,23 +165,7 @@
     html += "</ul>";
     document.getElementById("beneficios-checkout").innerHTML = html;
 
-    // 3. Supabase Configuración
-    const supabaseUrl = 'https://qrdlsnzpzqzurqvpterr.supabase.co'; // Ejemplo: 'https://xxxx.supabase.co'
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZGxzbnpwenF6dXJxdnB0ZXJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MTA5ODMsImV4cCI6MjA2NzQ4Njk4M30.p35Rv6V6RxyKWuGGEtrC0hqBgT1rqwkOEkqfnMyptXU'; // Ejemplo: 'eyJhbGciOiJIUzI1NiIs...'
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    async function guardarVentaSupabase(discord, email, membresia, fecha, transaccion) {
-      const { data, error } = await supabase
-        .from('ventas_membresia')
-        .insert([{ discord, email, membresia, fecha, transaccion }]);
-      if(error) {
-        console.error("Error Supabase:", error.message);
-      } else {
-        console.log("Venta guardada en Supabase:", data);
-      }
-    }
-
-    // 4. Paypal Button
+    // 3. Paypal Button Minimal
     paypal.Buttons({
       createOrder: function(data, actions) {
         var discord = document.getElementById('discord').value.trim();
@@ -201,55 +186,13 @@
       onApprove: function(data, actions) {
         document.getElementById("loader").style.display = "block";
         return actions.order.capture().then(function(details) {
-          var discord = document.getElementById('discord').value.trim();
-          var email = document.getElementById('email').value.trim();
-          var fecha = new Date().toLocaleString('es-PE');
-          var transaccion = details.id;
-
-          // 1. EmailJS al admin
-          emailjs.send('service_qhkpt0m', 'template_rnp9fwj', {
-            discord: discord,
-            email: email,
-            membresia: membresia,
-            fecha: fecha,
-            transaccion: transaccion
-          }).then(function(response) {
-            console.log('Email enviado!', response.status, response.text);
-          }, function(error) {
-            console.log('Error enviando email:', error);
-          });
-
-          // 2. Discord Webhook log
-          fetch('https://discord.com/api/webhooks/1398067809421885581/zCu0F7AvhH62lP3XoUerQHtIG7-Pd8o1Vw1ZSmh74eE8S6TQZMgBjmaJ0CU8GgTjbOPH', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              embeds: [
-                {
-                  title: "🛒 Nueva compra de membresía",
-                  color: membresia === "Dios del Caos" ? 15790505 : membresia === "Heraldo del Caos" ? 65534 : 4605510,
-                  fields: [
-                    { name: "Discord", value: discord, inline: true },
-                    { name: "Email", value: email, inline: true },
-                    { name: "Membresía", value: membresia, inline: true },
-                    { name: "Transacción", value: transaccion, inline: false },
-                    { name: "Fecha", value: fecha, inline: false }
-                  ],
-                  timestamp: new Date().toISOString()
-                }
-              ]
-            })
-          });
-
-          // 3. Guardar en Supabase
-          guardarVentaSupabase(discord, email, membresia, fecha, transaccion);
-
           document.getElementById("loader").style.display = "none";
           alert('¡Pago realizado! Te contactaremos por Discord o email para activar tu membresía.');
           window.location.href = "success.html";
         });
       },
       onCancel: function(data) {
+        document.getElementById("loader").style.display = "none";
         window.location.href = "cancel.html";
       }
     }).render('#paypal-button-container');
