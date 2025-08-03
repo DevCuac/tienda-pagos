@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Comprar Membresía</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <style>
+    .form-box {
+      background: rgba(28,30,38,0.95);
+      padding: 36px 22px 30px 22px;
+      border-radius: 19px;
+      display: inline-block;
+      margin: 70px auto 24px auto;
+      max-width: 415px;
+      box-shadow: 0 6px 30px #18181b44;
+      text-align: center;
+    }
+    .summary {
+      margin-bottom: 19px;
+      font-size: 1.18em;
+      color: #ededed;
+      letter-spacing: .2px;
+    }
+    .summary .m-name {
+      font-weight: bold;
+      color: #fafafa;
+      font-size: 1.1em;
+      letter-spacing: 1.1px;
+    }
+    .summary .m-price {
+      color: #f0d479;
+      font-weight: bold;
+    }
+    .benefits-checkout {
+      background: rgba(40,41,46,0.90);
+      color: #dfdfdf;
+      font-size: 0.99em;
+      padding: 10px 11px 7px 15px;
+      margin: 14px 0 18px 0;
+      border-radius: 11px;
+      box-shadow: 0 1px 7px #19191a11;
+      text-align: left;
+      min-height: 68px;
+    }
+    .benefits-checkout ul { margin: 0; padding: 0; list-style: none; }
+    .benefits-checkout li { margin-bottom: 6px; padding-left: 14px; position: relative; }
+    .benefits-checkout li:before {
+      content: "✓";
+      color: #bfbfbf;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+    label { display:block; margin:16px 0 7px; color:#ededed;}
+    input[type="text"], input[type="email"] {
+      padding:10px; border-radius:7px; border:none; width:93%; margin-bottom:12px; font-size:1em;
+      background: #25262b; color: #fafafa; outline: none; box-shadow:0 2px 8px #1a1a1a14;
+    }
+    input[type="text"]:focus, input[type="email"]:focus {
+      border:1.5px solid #f0d479; background:#232329;
+    }
+    #paypal-button-container { margin-top: 24px; }
+    .cert-check {
+      color: #b1b1b1; background: #22232b;
+      padding: 7px 0; margin: 19px 0 8px 0; border-radius: 8px;
+      font-size: 1.01em; text-align: center;
+    }
+    /* Loader animado */
+    .loader {
+      width: 54px; height: 54px;
+      margin: 25px auto 0 auto;
+      position: relative;
+      display: none;
+    }
+    .loader .spin {
+      width: 54px; height: 54px;
+      border: 5px solid #f0d47930;
+      border-top: 5px solid #f0d479;
+      border-radius: 50%;
+      position: absolute;
+      left: 0; top: 0;
+      animation: spin 0.7s linear infinite;
+    }
+    .loader .pulse {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: #f0d4792a;
+      position: absolute;
+      left: 6px; top: 6px;
+      animation: pulse 1.5s infinite cubic-bezier(.22,1.16,.61,.91);
+    }
+    @keyframes spin { 100% { transform: rotate(360deg);} }
+    @keyframes pulse {
+      0% { opacity: 0.45; transform: scale(1);}
+      50% { opacity: 0.17; transform: scale(1.11);}
+      100% { opacity: 0.45; transform: scale(1);}
+    }
+    @media (max-width:600px){.form-box{width:99vw;}}
+  </style>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){ emailjs.init('TGvPiZzBjNDwexyHd'); })();
+  </script>
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body style="background:linear-gradient(120deg, #181b22 0%, #23242b 100%);display:flex;justify-content:center;align-items:center;min-height:100vh;">
+  <div class="form-box">
+    <a href="index.html" style="text-decoration:none;"><img src="favicon.png" width="38" style="margin-bottom:13px; border-radius:9px;"></a>
+    <h2 style="color:#fafafa;">Comprar Membresía</h2>
+    <div class="summary">
+      Membresía: <span id="membresia-summary" class="m-name"></span><br>
+      Precio: <span id="precio-summary" class="m-price"></span> USD
+    </div>
+    <div class="benefits-checkout" id="beneficios-checkout"></div>
+    <form id="dataForm" onsubmit="return false;">
+      <label for="discord">Usuario de Discord *</label>
+      <input type="text" id="discord" required placeholder="ej: Angel#1234">
+      <label for="email">Correo electrónico *</label>
+      <input type="email" id="email" required placeholder="Tu correo">
+    </form>
+    <div class="cert-check">&#128274; Pago seguro con Paypal</div>
+    <div id="paypal-button-container"></div>
+    <div class="loader" id="loader">
+      <div class="spin"></div>
+      <div class="pulse"></div>
+    </div>
+  </div>
+
+  <!-- Paypal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AYERX9MCrIBI-_k2WIDr2HZurdnLFxX-y6SzoBG4uIZncakr1U7o-htayACmGvZa8VGmH9VvmsJPoj6K&currency=USD"></script>
+  <script>
+    // 1. Datos de membresía desde la URL
+    const params = new URLSearchParams(window.location.search);
+    const membresia = params.get('membresia') || 'Nacido del Caos';
+    const precio = params.get('precio') || '8';
+    document.getElementById('membresia-summary').textContent = membresia;
+    document.getElementById('precio-summary').textContent = precio;
+
+    // 2. Resumen de beneficios dinámico
+    const beneficios = {
+      "Nacido del Caos": [
+        "Rol exclusivo Discord",
+        "Acceso premium a canales y sorteos",
+        "Beneficios digitales básicos"
+      ],
+      "Heraldo del Caos": [
+        "Rol VIP Discord",
+        "Más beneficios exclusivos",
+        "Recompensas diarias mejoradas"
+      ],
+      "Dios del Caos": [
+        "Rol supremo Discord",
+        "Todos los beneficios VIP + ultra",
+        "Acceso a sorteos y eventos legendarios"
+      ]
+    };
+    let lista = beneficios[membresia] || beneficios["Nacido del Caos"];
+    let html = "<ul>";
+    lista.forEach(b=>html+=`<li>${b}</li>`);
+    html += "</ul>";
+    document.getElementById("beneficios-checkout").innerHTML = html;
+
+    // 3. Supabase Configuración
+    const supabaseUrl = 'https://qrdlsnzpzqzurqvpterr.supabase.co'; // Ejemplo: 'https://xxxx.supabase.co'
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyZGxzbnpwenF6dXJxdnB0ZXJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MTA5ODMsImV4cCI6MjA2NzQ4Njk4M30.p35Rv6V6RxyKWuGGEtrC0hqBgT1rqwkOEkqfnMyptXU'; // Ejemplo: 'eyJhbGciOiJIUzI1NiIs...'
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function guardarVentaSupabase(discord, email, membresia, fecha, transaccion) {
+      const { data, error } = await supabase
+        .from('ventas_membresia')
+        .insert([{ discord, email, membresia, fecha, transaccion }]);
+      if(error) {
+        console.error("Error Supabase:", error.message);
+      } else {
+        console.log("Venta guardada en Supabase:", data);
+      }
+    }
+
+    // 4. Paypal Button
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        var discord = document.getElementById('discord').value.trim();
+        var email = document.getElementById('email').value.trim();
+        if (!discord || !email) {
+          alert('Completa todos los campos antes de pagar.');
+          return false;
+        }
+        document.getElementById("loader").style.display = "block";
+        return actions.order.create({
+          purchase_units: [{
+            amount: { value: precio, currency_code: "USD" },
+            description: `Membresía ${membresia}`,
+            custom_id: `${discord}|${membresia}|${email}`
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        document.getElementById("loader").style.display = "block";
+        return actions.order.capture().then(function(details) {
+          var discord = document.getElementById('discord').value.trim();
+          var email = document.getElementById('email').value.trim();
+          var fecha = new Date().toLocaleString('es-PE');
+          var transaccion = details.id;
+
+          // 1. EmailJS al admin
+          emailjs.send('service_qhkpt0m', 'template_rnp9fwj', {
+            discord: discord,
+            email: email,
+            membresia: membresia,
+            fecha: fecha,
+            transaccion: transaccion
+          }).then(function(response) {
+            console.log('Email enviado!', response.status, response.text);
+          }, function(error) {
+            console.log('Error enviando email:', error);
+          });
+
+          // 2. Discord Webhook log
+          fetch('https://discord.com/api/webhooks/1398067809421885581/zCu0F7AvhH62lP3XoUerQHtIG7-Pd8o1Vw1ZSmh74eE8S6TQZMgBjmaJ0CU8GgTjbOPH', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              embeds: [
+                {
+                  title: "🛒 Nueva compra de membresía",
+                  color: membresia === "Dios del Caos" ? 15790505 : membresia === "Heraldo del Caos" ? 65534 : 4605510,
+                  fields: [
+                    { name: "Discord", value: discord, inline: true },
+                    { name: "Email", value: email, inline: true },
+                    { name: "Membresía", value: membresia, inline: true },
+                    { name: "Transacción", value: transaccion, inline: false },
+                    { name: "Fecha", value: fecha, inline: false }
+                  ],
+                  timestamp: new Date().toISOString()
+                }
+              ]
+            })
+          });
+
+          // 3. Guardar en Supabase
+          guardarVentaSupabase(discord, email, membresia, fecha, transaccion);
+
+          document.getElementById("loader").style.display = "none";
+          alert('¡Pago realizado! Te contactaremos por Discord o email para activar tu membresía.');
+          window.location.href = "success.html";
+        });
+      },
+      onCancel: function(data) {
+        window.location.href = "cancel.html";
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>

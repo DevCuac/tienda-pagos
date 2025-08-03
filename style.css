@@ -1,0 +1,293 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #181b22 0%, #23242b 100%);
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 36px 12px 24px 12px;
+}
+header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.logo {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 13px;
+  border-radius: 16px;
+  box-shadow: 0 2px 18px #191a1d66;
+}
+h1 {
+  color: #fafafa;
+  font-size: 2.2rem;
+  margin: 10px 0 9px 0;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+header p {
+  color: #b6bac3;
+  font-size: 1.09rem;
+  margin: 0 0 13px 0;
+}
+.cards.horizontal {
+  display: flex;
+  gap: 38px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  margin-bottom: 26px;
+}
+.card {
+  min-width: 278px;
+  max-width: 350px;
+  padding: 36px 26px 30px 26px;
+  border-radius: 21px;
+  box-shadow: 0 10px 40px 0 #191a1d28, 0 2px 20px #21242e13;
+  backdrop-filter: blur(20px);
+  background: rgba(25,28,34,0.88);
+  text-align: center;
+  position: relative;
+  border: 2.3px solid #22242d42;
+  margin-bottom: 22px;
+  transition: 
+    transform 0.16s cubic-bezier(.41,1.17,.78,1.13),
+    box-shadow 0.19s,
+    border-color 0.17s,
+    background 0.18s;
+}
+.card .icon-tier {
+  margin-bottom: 10px;
+}
+.card h2 {
+  margin: 0 0 15px 0;
+  font-size: 1.32rem;
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  text-shadow: 0 2px 18px #10101522;
+}
+.card .price {
+  font-size: 2.45rem;
+  color: #bfbfbf;
+  font-weight: 900;
+  margin: 0 0 17px 0;
+  letter-spacing: 1.08px;
+}
+.card .price span {
+  font-size: 1.07rem;
+  color: #e1e1e1;
+  font-weight: 400;
+}
+.card ul {
+  padding: 0 0 15px 0;
+  margin: 0 0 18px 0;
+  list-style: none;
+  color: #ededed;
+  font-size: 1.05em;
+  text-align: left;
+}
+.card ul li {
+  margin-bottom: 6px;
+  text-shadow: 0 1px 10px #0002;
+  padding-left: 14px;
+  position: relative;
+}
+.card ul li:before {
+  content: "✓";
+  color: #ddd;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+.btn-paypal {
+  display: block;
+  background: linear-gradient(90deg, #27282c 0%, #44454c 100%);
+  color: #fff;
+  border: none;
+  border-radius: 11px;
+  padding: 15px 0;
+  margin-bottom: 13px;
+  font-weight: 800;
+  font-size: 1.09rem;
+  cursor: pointer;
+  box-shadow: 0 2px 10px #24242b3f;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: background 0.13s, color 0.13s, transform 0.12s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-paypal:before {
+  content: "";
+  display: inline-block;
+  background-image: url('https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 28px;
+  height: 28px;
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.btn-paypal span { margin-left: 20px; }
+.btn-paypal:hover {
+  background: linear-gradient(90deg, #fff 0%, #303136 100%);
+  color: #1c1c22;
+  transform: scale(1.045);
+  box-shadow: 0 3px 16px #bfbfbf26;
+}
+.btn-alt {
+  display: block;
+  background: linear-gradient(90deg, #2b2e32 0%, #575963 100%);
+  color: #fafafa;
+  border: none;
+  border-radius: 11px;
+  padding: 13px 0;
+  margin-bottom: 0;
+  font-weight: 700;
+  font-size: 1.03rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #3b3b3b2a;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: background 0.18s, color 0.13s, transform 0.13s;
+}
+.btn-alt:hover {
+  background: linear-gradient(90deg, #575963 0%, #2b2e32 100%);
+  color: #fff;
+  transform: scale(1.025);
+}
+/* HOVER ÚNICO POR MEMBRESÍA */
+.card.caos-comun:hover {
+  box-shadow: 0 7px 32px #70b6ff3a, 0 0 0 #0000;
+  border-color: #7db0e6;
+  background: rgba(39,49,66,0.96);
+  transform: translateY(-4px) scale(1.045) rotate(-0.7deg);
+}
+.card.caos-heraldo:hover {
+  box-shadow: 0 8px 36px #6ef6b747, 0 0 0 #0000;
+  border-color: #81e9c7;
+  background: rgba(40,55,46,0.97);
+  transform: translateY(-4px) scale(1.045) rotate(0.8deg);
+}
+.card.caos-dios:hover {
+  box-shadow: 0 10px 48px #f0d47963, 0 0 0 #0000;
+  border-color: #f0d479;
+  background: rgba(70,66,44,0.98);
+  transform: translateY(-6px) scale(1.06) rotate(-1.2deg);
+}
+.card.featured {
+  border: 3.2px solid #f0d479;
+  box-shadow: 0 7px 44px #f0d47926, 0 0px 0 #fff0;
+  z-index: 2;
+}
+.certs {
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 18px;
+}
+.secure-pay {
+  color: #d3d3d3;
+  background: rgba(36,40,48,0.93);
+  display: inline-block;
+  padding: 9px 22px;
+  border-radius: 11px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  font-size: 1.08em;
+  box-shadow: 0 1px 8px #12121316;
+}
+.secure-pay .padlock { margin-right: 7px; }
+.faq-benefits {
+  margin: 34px auto 0 auto;
+  max-width: 680px;
+  background: rgba(28,28,34,0.75);
+  border-radius: 14px;
+  box-shadow: 0 1px 10px #17171a13;
+  padding: 18px 28px 24px 28px;
+}
+.faq-benefits h3 {
+  color: #ededed;
+  font-size: 1.22em;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.faq-benefits details {
+  margin-bottom: 8px;
+  color: #d1d1d1;
+  font-size: 1em;
+}
+.faq-benefits summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2px;
+  outline: none;
+}
+.faq-benefits details[open] summary {
+  color: #f0d479;
+}
+footer {
+  text-align: center;
+  color: #a7a7a7;
+  margin-top: 36px;
+  font-size: 1rem;
+}
+footer a {
+  color: #fafafa;
+  text-decoration: underline;
+}
+/* Botón flotante WhatsApp */
+.whatsapp-float {
+  position: fixed;
+  bottom: 32px;
+  right: 34px;
+  background: #24252b;
+  color: #fff;
+  padding: 13px 21px;
+  border-radius: 17px;
+  font-weight: 700;
+  font-size: 1.04em;
+  box-shadow: 0 6px 22px #21242e32;
+  text-decoration: none;
+  border: 2px solid #232329;
+  z-index: 100;
+  transition: background 0.15s, box-shadow 0.14s, color 0.12s;
+}
+.whatsapp-float:hover {
+  background: #f0d479;
+  color: #232329;
+  box-shadow: 0 8px 32px #f0d47951;
+}
+@media (max-width: 1050px) {
+  .cards.horizontal {
+    gap: 14px;
+  }
+  .card { min-width: 220px; }
+}
+@media (max-width: 900px) {
+  .cards.horizontal {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+@media (max-width: 800px) {
+  .cards.horizontal {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .faq-benefits { padding: 13px 8px 15px 8px; }
+}
+@media (max-width: 600px) {
+  .logo { width: 50px; height: 50px; }
+  .container { padding: 14px 2px 8px 2px; }
+  h1 { font-size: 1.18rem; }
+  .card { padding: 20px 6px 17px 6px; min-width: 95vw; }
+  .faq-benefits { font-size: 0.95em; }
+  .whatsapp-float { bottom: 16px; right: 7px; font-size: 0.92em; }
+}
