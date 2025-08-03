@@ -123,7 +123,6 @@ header p {
 .btn-paypal:before {
   content: "";
   display: inline-block;
-  background-image: url('https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png');
   background-size: contain;
   background-repeat: no-repeat;
   width: 28px;
